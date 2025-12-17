@@ -50,7 +50,29 @@ if ((string)$res['user_id'] !== (string)$_SESSION['user']['_id'] && ($_SESSION['
 
 // mark as cancelled
 try {
-    $db->reservations->updateOne(['_id' => $res['_id']], ['$set' => ['status' => 'annulée', 'cancelled_at' => date('c')]]);
+    $cancelResult = $db->reservations->updateOne(
+        ['_id' => $res['_id'], 'status' => ['$ne' => 'annulée']],
+        ['$set' => ['status' => 'annulée', 'cancelled_at' => date('c')]]
+    );
+
+    if (($cancelResult->getModifiedCount() ?? 0) < 1) {
+        header('Location: booking_confirm.php?id=' . urlencode($reservationId) . '&cancelled=1');
+        exit;
+    }
+
+    // Restore stock for the offer
+    $offerObjectId = $res['offer_id'] ?? null;
+    if ($offerObjectId) {
+        // Backfill legacy offers (no quantity field yet)
+        $db->offers->updateOne(
+            ['_id' => $offerObjectId, 'quantity' => ['$exists' => false]],
+            ['$set' => ['quantity' => 0]]
+        );
+        $db->offers->updateOne(
+            ['_id' => $offerObjectId],
+            ['$inc' => ['quantity' => 1], '$set' => ['available' => true]]
+        );
+    }
 } catch (Exception $e) {
     app_log('Reservations cancel update error (frontend)', ['error' => $e->getMessage()]);
     echo 'Erreur lors de l\'annulation';

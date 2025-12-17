@@ -118,11 +118,20 @@ $topReserved = $db->reservations->aggregate([
   </thead>
   <tbody>
   <?php foreach ($offers as $offer): ?>
+    <?php
+      $quantity = (int)($offer['quantity'] ?? 0);
+      $isAvailable = !empty($offer['available']) && $quantity > 0;
+    ?>
     <tr>
       <td><?php echo htmlspecialchars($offer['title']); ?></td>
       <td><?php echo htmlspecialchars($offer['type'] ?? ''); ?></td>
       <td><?php echo htmlspecialchars($offer['price']); ?> €</td>
-      <td><?php echo !empty($offer['available']) ? 'Oui' : 'Non'; ?></td>
+      <td>
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+          <span class="badge <?php echo $isAvailable ? 'text-bg-success' : 'text-bg-secondary'; ?>"><?php echo $isAvailable ? 'Disponible' : 'Indisponible'; ?></span>
+          <span class="text-muted small">Stock: <?php echo (int)$quantity; ?></span>
+        </div>
+      </td>
       <td>
         <a class="btn btn-sm btn-primary" href="edit_offer.php?id=<?php echo (string)$offer['_id']; ?>">Éditer</a>
         <form style="display:inline-block" method="post" action="delete_offer.php" onsubmit="return confirm('Supprimer cette offre ?');">

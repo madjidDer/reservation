@@ -1,0 +1,13 @@
+# Dependencies
+/vendor/
+
+# Runtime logs
+/logs/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Optional local env
+.env

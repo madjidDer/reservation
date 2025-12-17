@@ -2,7 +2,7 @@
 // Frontend shared layout header
 require_once __DIR__ . '/../../backend/config/session.php';
 
-$title = $title ?? 'Vacation Booking';
+$title = $title ?? 'A2LMN Booking';
 $user = $_SESSION['user'] ?? null;
 $isLoggedIn = $user !== null;
 $isAdmin = ($user['role'] ?? '') === 'admin';
@@ -19,9 +19,9 @@ $isAdmin = ($user['role'] ?? '') === 'admin';
 <body>
 <div class="vb-page">
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
   <div class="container">
-    <a class="navbar-brand fw-semibold" href="index.php">Vacation Booking</a>
+    <a class="navbar-brand fw-semibold" href="index.php">A2LMN Booking</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#vbNav" aria-controls="vbNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>

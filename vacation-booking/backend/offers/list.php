@@ -17,7 +17,7 @@ $offers = $db->offers->find([], ['sort' => ['_id' => -1]]);
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
     <div class="container">
-        <a class="navbar-brand fw-semibold" href="/vacation-booking/">Vacation Booking</a>
+        <a class="navbar-brand fw-semibold" href="/vacation-booking/">A2LMN Booking</a>
         <div class="d-flex gap-2">
             <a class="btn btn-outline-light" href="/vacation-booking/frontend/offers.php">Voir côté site</a>
             <a class="btn btn-secondary" href="/vacation-booking/backend/admin/dashboard.php">Admin</a>

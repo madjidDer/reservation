@@ -26,6 +26,18 @@ if (!$offer) {
 $title = (string)($offer['title'] ?? 'Offre');
 require __DIR__ . '/partials/header.php';
 require_once __DIR__ . '/../backend/config/csrf.php';
+
+$quantity = null;
+$hasQuantity = isset($offer['quantity']);
+if (!$hasQuantity && $offer instanceof ArrayAccess) {
+  $hasQuantity = $offer->offsetExists('quantity');
+}
+if ($hasQuantity) {
+  $quantity = (int)($offer['quantity'] ?? 0);
+}
+
+$isOfferAvailable = !empty($offer['available']) && ($quantity === null || $quantity > 0);
+$error = trim($_GET['error'] ?? '');
 ?>
 
 <a href="offers.php" class="btn btn-outline-secondary btn-sm mb-3">← Retour aux offres</a>
@@ -49,7 +61,15 @@ require_once __DIR__ . '/../backend/config/csrf.php';
         <div class="text-muted">Réservation</div>
         <div class="fw-semibold mb-3">Finalisez en 1 clic</div>
 
-<?php if (isset($_SESSION['user'])): ?>
+      <?php if ($error === 'complet'): ?>
+        <div class="alert alert-warning">Désolé, cet évènement est complet.</div>
+      <?php endif; ?>
+
+      <?php if ($quantity !== null): ?>
+        <div class="small vb-muted mb-3">Places restantes : <span class="fw-semibold"><?php echo (int)$quantity; ?></span></div>
+      <?php endif; ?>
+
+      <?php if ($isOfferAvailable && isset($_SESSION['user'])): ?>
         <form method="post" action="reservations_create.php">
           <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(csrf_token()); ?>">
           <input type="hidden" name="offer_id" value="<?php echo (string)$offer['_id']; ?>">
@@ -57,7 +77,9 @@ require_once __DIR__ . '/../backend/config/csrf.php';
             <button class="btn btn-success" type="submit">Réserver (paiement simulé)</button>
           </div>
         </form>
-<?php else: ?>
+      <?php elseif (!$isOfferAvailable): ?>
+        <div class="alert alert-secondary mb-0">Indisponible pour le moment.</div>
+      <?php else: ?>
         <div class="alert alert-warning mb-0">Vous devez <a href="login.php">vous connecter</a> pour réserver.</div>
 <?php endif; ?>
 

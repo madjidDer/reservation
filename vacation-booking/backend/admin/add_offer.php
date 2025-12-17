@@ -13,19 +13,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $type = trim($_POST['type'] ?? '');
     $description = trim($_POST['description'] ?? '');
     $price = (float)($_POST['price'] ?? 0);
+    $quantity = (int)($_POST['quantity'] ?? 0);
+    if ($quantity < 0) { $quantity = 0; }
     $photos_input = trim($_POST['photos'] ?? '');
     $photos = $photos_input === '' ? [] : array_map('trim', explode(',', $photos_input));
 
       if ($title === '' || $type === '') {
         $error = 'Le titre et le type sont requis.';
       } else {
+        $available = isset($_POST['available']) ? true : false;
+        if ($quantity <= 0) {
+          $available = false;
+        }
         $db->offers->insertOne([
           'type' => $type,
           'title' => $title,
           'description' => $description,
           'price' => $price,
-          'available' => isset($_POST['available']) ? true : false,
-          'photos' => $photos
+          'quantity' => $quantity,
+          'available' => $available,
+          'photos' => $photos,
+          'created_at' => new MongoDB\BSON\UTCDateTime((int)(microtime(true) * 1000))
         ]);
         header('Location: offers.php');
         exit;
@@ -65,6 +73,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <div class="mb-3">
     <label class="form-label">Prix</label>
     <input class="form-control" name="price" type="number" step="0.01">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Quantité (places disponibles)</label>
+    <input class="form-control" name="quantity" type="number" min="0" step="1" value="10" required>
+    <div class="form-text">À 0, l'évènement devient automatiquement indisponible.</div>
   </div>
   <div class="mb-3">
     <label class="form-label">Photos (URLs séparées par des virgules)</label>

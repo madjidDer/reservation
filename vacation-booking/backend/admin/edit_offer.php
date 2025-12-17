@@ -44,6 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $type = trim($_POST['type'] ?? '');
     $description = trim($_POST['description'] ?? '');
     $price = (float)($_POST['price'] ?? 0);
+    $quantity = (int)($_POST['quantity'] ?? 0);
+    if ($quantity < 0) { $quantity = 0; }
     $photos_input = trim($_POST['photos'] ?? '');
     // Accept comma-separated URLs. Also accept ';' as separator.
     $photos_input = str_replace(';', ',', $photos_input);
@@ -52,12 +54,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       if ($title === '' || $type === '') {
         $error = 'Le titre et le type sont requis.';
       } else {
+        $available = isset($_POST['available']) ? true : false;
+        if ($quantity <= 0) {
+          $available = false;
+        }
         $db->offers->updateOne(['_id' => $offer['_id']], ['$set' => [
           'type' => $type,
           'title' => $title,
           'description' => $description,
           'price' => $price,
-          'available' => isset($_POST['available']) ? true : false,
+          'quantity' => $quantity,
+          'available' => $available,
           'photos' => $photos
         ]]);
         header('Location: offers.php');
@@ -95,6 +102,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <div class="mb-3">
     <label class="form-label">Prix</label>
     <input class="form-control" name="price" type="number" step="0.01" value="<?php echo htmlspecialchars($offer['price'] ?? ''); ?>">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Quantité (places disponibles)</label>
+    <input class="form-control" name="quantity" type="number" min="0" step="1" value="<?php echo htmlspecialchars((string)($offer['quantity'] ?? 0)); ?>" required>
+    <div class="form-text">À 0, l'évènement devient automatiquement indisponible.</div>
   </div>
   <div class="mb-3">
     <label class="form-label">Photos (URLs séparées par des virgules)</label>

@@ -2,7 +2,7 @@
 
 <footer class="border-top">
   <div class="container py-3 small vb-muted d-flex justify-content-between align-items-center">
-    <div>© <?php echo date('Y'); ?> Vacation Booking</div>
+    <div>© <?php echo date('Y'); ?> A2LMN Booking</div>
     <div class="text-end">Projet démo</div>
   </div>
 </footer>
